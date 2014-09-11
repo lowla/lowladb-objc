@@ -1,0 +1,11 @@
+language: objective-c
+before_install:
+    - gem install cocoapods --no-rdoc --no-ri --no-document --quiet
+    - gem install xcpretty --no-rdoc --no-ri --no-document --quiet
+    - cd Tests
+	- git clone https://github.com/lowla/liblowladb.git
+	- sed -e 's|../../liblowladb|liblowladb|' -i '' Podfile
+	- pod install
+	- cd $TRAVIS_BUILD_DIR
+script: rake
+
