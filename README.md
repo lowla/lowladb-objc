@@ -1,6 +1,6 @@
 # lowladb-objc
 
-[![CI Status](http://img.shields.io/travis/lowla/lowladb-objc.svg?style=flat)](https://travis-ci.org/Mark Dixon/lowladb-objc)
+[![CI Status](http://img.shields.io/travis/lowla/lowladb-objc.svg?style=flat)](https://travis-ci.org/lowla/lowladb-objc)
 [![Version](https://img.shields.io/cocoapods/v/lowladb-objc.svg?style=flat)](http://cocoadocs.org/docsets/lowladb-objc)
 [![License](https://img.shields.io/cocoapods/l/lowladb-objc.svg?style=flat)](http://cocoadocs.org/docsets/lowladb-objc)
 [![Platform](https://img.shields.io/cocoapods/p/lowladb-objc.svg?style=flat)](http://cocoadocs.org/docsets/lowladb-objc)
