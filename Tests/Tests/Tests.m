@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Mark Dixon. All rights reserved.
 //
 
-#import "lowladb-objc/LDBClient.h"
+#import "LDBClient.h"
 #import "lowladb-objc/LDBCollection.h"
 #import "lowladb-objc/LDBCursor.h"
 #import "lowladb-objc/LDBDb.h"
@@ -15,146 +15,171 @@
 #import "lowladb-objc/LDBObjectId.h"
 #import "lowladb-objc/LDBWriteResult.h"
 
-SpecBegin(lowladb)
+@interface LDB_BasicFunctionalityTests : XCTestCase
+@end
 
-describe(@"basic functionality", ^{
-    it(@"has the correct version", ^{
-        LDBClient *client = [[LDBClient alloc] init];
-        expect(client.version).to.equal(@"0.1.0");
-    });
-    
-    it (@"can create database references", ^{
-        LDBClient *client = [[LDBClient alloc] init];
-        LDBDb *db = [client getDatabase:@"mydb"];
-        expect(db.name).to.equal(@"mydb");
-    });
-    
-    it (@"can create collection references", ^{
-        LDBClient *client = [[LDBClient alloc] init];
-        LDBDb *db = [client getDatabase:@"mydb"];
-        LDBCollection *coll = [db getCollection:@"mycoll.dotted"];
-        expect(coll.db).to.equal(db);
-        expect(coll.name).to.equal(@"mycoll.dotted");
-    });
-});
+@implementation LDB_BasicFunctionalityTests
 
-describe(@"object building", ^{
-    it(@"can build doubles", ^{
-        LDBObject *obj = [[[LDBObjectBuilder builder] appendDouble:3.14 forField:@"myfield"] finish];
-        expect([obj containsField:@"myfield"]).to.beTruthy();
-        expect([obj doubleForField:@"myfield"]).to.equal(3.14);
-    });
-    
-    it(@"can build strings", ^{
-        LDBObject *obj = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"myfield"] finish];
-        expect([obj containsField:@"myfield"]).to.beTruthy();
-        expect([obj stringForField:@"myfield"]).to.equal(@"mystring");
-    });
-    
-    it(@"can build objects", ^{
-        LDBObject *subObj = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"myfield"] finish];
-        LDBObject *obj = [[[LDBObjectBuilder builder] appendObject:subObj forField:@"myfield"] finish];
-        expect([obj containsField:@"myfield"]).to.beTruthy();
-        expect([obj objectForField:@"myfield"]).to.equal(subObj);
-    });
-    
-    it(@"can build objectIds", ^{
-        LDBObjectId *oid = [LDBObjectId generate];
-        LDBObject *obj = [[[LDBObjectBuilder builder] appendObjectId:oid forField:@"myfield"] finish];
-        expect([obj containsField:@"myfield"]).to.beTruthy();
-        expect([obj objectIdForField:@"myfield"]).to.equal(oid);
-    });
-    
-    it(@"can build bools", ^{
-        LDBObject *obj = [[[LDBObjectBuilder builder] appendBool:YES forField:@"myfield"] finish];
-        expect([obj containsField:@"myfield"]).to.beTruthy();
-        expect([obj boolForField:@"myfield"]).to.equal(YES);
-    });
-    
-    it (@"can build dates", ^{
-        NSDate *date = [NSDate date];
-        LDBObject *obj = [[[LDBObjectBuilder builder] appendDate:date forField:@"myfield"] finish];
-        expect([obj containsField:@"myfield"]).to.beTruthy();
-        NSTimeInterval i1 = [date timeIntervalSince1970];
-        NSTimeInterval i2 = [[obj dateForField:@"myfield"] timeIntervalSince1970];
-        expect(i1).beCloseTo(i2);
-    });
-    
-    it(@"can build ints", ^{
-        LDBObject *obj = [[[LDBObjectBuilder builder] appendInt:314 forField:@"myfield"] finish];
-        expect([obj containsField:@"myfield"]).to.beTruthy();
-        expect([obj intForField:@"myfield"]).to.equal(314);
-    });
+-(void)testItHasTheCorrectVersion
+{
+    LDBClient *client = [[LDBClient alloc] init];
+    XCTAssertEqualObjects(client.version, @"0.1.0");
+}
 
-    it(@"can build longs", ^{
-        LDBObject *obj = [[[LDBObjectBuilder builder] appendLong:314000000000000 forField:@"myfield"] finish];
-        expect([obj containsField:@"myfield"]).to.beTruthy();
-        expect([obj longForField:@"myfield"]).to.equal(314000000000000);
-    });
+-(void)testItCanCreateDatabaseReferences
+{
+    LDBClient *client = [[LDBClient alloc] init];
+    LDBDb *db = [client getDatabase:@"mydb"];
+    XCTAssertEqualObjects(db.name, @"mydb");
+}
 
-});
+-(void)testItCanCreateCollectionReferences
+{
+    LDBClient *client = [[LDBClient alloc] init];
+    LDBDb *db = [client getDatabase:@"mydb"];
+    LDBCollection *coll = [db getCollection:@"mycoll.dotted"];
+    XCTAssertEqualObjects(coll.db, db);
+    XCTAssertEqualObjects(coll.name, @"mycoll.dotted");
+}
 
-describe(@"basic insert and retrieval", ^{
-    __block LDBClient *client;
-    __block LDBDb *db;
-    __block LDBCollection *coll;
-    
-    beforeEach(^{
-        client = [[LDBClient alloc] init];
-        [client dropDatabase:@"mydb"];
-        db = [client getDatabase:@"mydb"];
-        coll = [db getCollection:@"mycoll"];
-    });
-    
-    afterEach(^{
-        coll = nil;
-        db = nil;
-        [client dropDatabase:@"mydb"];
-        client = nil;
-    });
-    
-    it (@"can create single string documents", ^{
-        LDBObject *object = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"myfield"] finish];
-        LDBWriteResult *wr = [coll insert:object];
-        expect(wr.upsertedId).notTo.equal(nil);
-    });
-    
-    it (@"creates a new id for each document", ^{
-        LDBObject *object = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"myfield"] finish];
-        LDBWriteResult *wr = [coll insert:object];
-        LDBWriteResult *wr2 = [coll insert:object];
-        NSLog(@"%@->%@", wr.upsertedId, wr2.upsertedId);
-        expect(wr.upsertedId).notTo.equal(wr2.upsertedId);
-    });
-    
-    it (@"can find the first document", ^{
-        LDBObject *object = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"myfield"] finish];
-        LDBWriteResult *wr = [coll insert:object];
-        LDBObject *found = [coll findOne];
-        NSString *check = [found stringForField:@"myfield"];
-        LDBObjectId *checkId = [found objectIdForField:@"_id"];
-        expect(check).to.equal(@"mystring");
-        expect(checkId).to.equal(wr.upsertedId);
-    });
-    
-    it (@"can find two documents", ^{
-        // The tests need an autoreleasepool to free the ExpExpect objects since they own their blocks that, in turn,
-        // own references to the cursor. Not freeing the cursor prevents us freeing the database in afterEach.
-        @autoreleasepool {
-        LDBObject *object1 = [[[LDBObjectBuilder builder] appendString:@"mystring1" forField:@"myfield"] finish];
-        LDBWriteResult *wr1 = [coll insert:object1];
-        LDBObject *object2 = [[[LDBObjectBuilder builder] appendString:@"mystring2" forField:@"myfield"] finish];
-        LDBWriteResult *wr2 = [coll insert:object2];
-        LDBCursor *cursor = [coll find];
-        expect([cursor hasNext]).to.beTruthy();
-        LDBObject *check1 = [cursor next];
-        expect([cursor hasNext]).to.beTruthy();
-        LDBObject *check2 = [cursor next];
-        expect([cursor hasNext]).to.beFalsy;
-        expect([wr1 upsertedId]).to.equal([check1 objectIdForField:@"_id"]);
-        expect([wr2 upsertedId]).to.equal([check2 objectIdForField:@"_id"]);
-        }
-    });
-});
+@end
 
-SpecEnd
+@interface LDB_ObjectBuildingTests : XCTestCase
+
+@end
+
+@implementation LDB_ObjectBuildingTests
+
+-(void)testItCanBuildDoubles
+{
+    LDBObject *obj = [[[LDBObjectBuilder builder] appendDouble:3.14 forField:@"myfield"] finish];
+    XCTAssert([obj containsField:@"myfield"]);
+    XCTAssertEqual([obj doubleForField:@"myfield"], 3.14);
+}
+
+-(void)testItCanBuildStrings
+{
+    LDBObject *obj = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"myfield"] finish];
+    XCTAssert([obj containsField:@"myfield"]);
+    XCTAssertEqualObjects([obj stringForField:@"myfield"], @"mystring");
+}
+
+-(void)testItCanBuildObjects
+{
+    LDBObject *subObj = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"myfield"] finish];
+    LDBObject *obj = [[[LDBObjectBuilder builder] appendObject:subObj forField:@"myfield"] finish];
+    XCTAssert([obj containsField:@"myfield"]);
+    XCTAssertEqualObjects([obj objectForField:@"myfield"], subObj);
+}
+
+-(void)testItCanBuildObjectIds
+{
+    LDBObjectId *oid = [LDBObjectId generate];
+    LDBObject *obj = [[[LDBObjectBuilder builder] appendObjectId:oid forField:@"myfield"] finish];
+    XCTAssert([obj containsField:@"myfield"]);
+    XCTAssertEqualObjects([obj objectIdForField:@"myfield"], oid);
+}
+
+-(void)testItCanBuildBools
+{
+    LDBObject *obj = [[[LDBObjectBuilder builder] appendBool:YES forField:@"myfield"] finish];
+    XCTAssert([obj containsField:@"myfield"]);
+    XCTAssertEqual([obj boolForField:@"myfield"], YES);
+}
+
+-(void)testItCanBuildDates
+{
+    NSDate *date = [NSDate date];
+    LDBObject *obj = [[[LDBObjectBuilder builder] appendDate:date forField:@"myfield"] finish];
+    XCTAssert([obj containsField:@"myfield"]);
+    NSTimeInterval i1 = [date timeIntervalSince1970];
+    NSTimeInterval i2 = [[obj dateForField:@"myfield"] timeIntervalSince1970];
+    XCTAssertEqualWithAccuracy(i1, i2, 1e-3);
+}
+
+-(void)testItCanBuildInts
+{
+    LDBObject *obj = [[[LDBObjectBuilder builder] appendInt:314 forField:@"myfield"] finish];
+    XCTAssert([obj containsField:@"myfield"]);
+    XCTAssertEqual([obj intForField:@"myfield"], 314);
+}
+
+-(void)testItCanBuildLongs
+{
+    LDBObject *obj = [[[LDBObjectBuilder builder] appendLong:314000000000000 forField:@"myfield"] finish];
+    XCTAssert([obj containsField:@"myfield"]);
+    XCTAssertEqual([obj longForField:@"myfield"], 314000000000000);
+}
+
+@end
+
+@interface LDB_BasicInsertAndRetrievalTests : XCTestCase
+{
+    LDBClient *client;
+    LDBDb *db;
+    LDBCollection *coll;
+}
+
+@end
+
+@implementation LDB_BasicInsertAndRetrievalTests
+
+-(void)setUp
+{
+    client = [[LDBClient alloc] init];
+    [client dropDatabase:@"mydb"];
+    db = [client getDatabase:@"mydb"];
+    coll = [db getCollection:@"mycoll"];
+}
+
+-(void)tearDown
+{
+    coll = nil;
+    db = nil;
+    [client dropDatabase:@"mydb"];
+    client = nil;
+}
+
+-(void)testItCanCreateSingleStringDocuments
+{
+    LDBObject *object = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"myfield"] finish];
+    LDBWriteResult *wr = [coll insert:object];
+    XCTAssertNotNil(wr.upsertedId);
+}
+
+-(void)testItCreatesANewIdForEachDocument
+{
+    LDBObject *object = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"myfield"] finish];
+    LDBWriteResult *wr = [coll insert:object];
+    LDBWriteResult *wr2 = [coll insert:object];
+    XCTAssertNotEqualObjects(wr.upsertedId, wr2.upsertedId);
+}
+
+-(void)testItCanFindTheFirstDocument
+{
+    LDBObject *object = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"myfield"] finish];
+    LDBWriteResult *wr = [coll insert:object];
+    LDBObject *found = [coll findOne];
+    NSString *check = [found stringForField:@"myfield"];
+    LDBObjectId *checkId = [found objectIdForField:@"_id"];
+    XCTAssertEqualObjects(check, @"mystring");
+    XCTAssertEqualObjects(checkId, wr.upsertedId);
+}
+
+-(void)testItCanFindTwoDocuments
+{
+    LDBObject *object1 = [[[LDBObjectBuilder builder] appendString:@"mystring1" forField:@"myfield"] finish];
+    LDBWriteResult *wr1 = [coll insert:object1];
+    LDBObject *object2 = [[[LDBObjectBuilder builder] appendString:@"mystring2" forField:@"myfield"] finish];
+    LDBWriteResult *wr2 = [coll insert:object2];
+    LDBCursor *cursor = [coll find];
+    XCTAssertTrue([cursor hasNext]);
+    LDBObject *check1 = [cursor next];
+    XCTAssertTrue([cursor hasNext]);
+    LDBObject *check2 = [cursor next];
+    XCTAssertFalse([cursor hasNext]);
+    XCTAssertEqualObjects([wr1 upsertedId], [check1 objectIdForField:@"_id"]);
+    XCTAssertEqualObjects([wr2 upsertedId], [check2 objectIdForField:@"_id"]);
+}
+
+@end
