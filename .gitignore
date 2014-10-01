@@ -24,3 +24,5 @@ DerivedData
 
 Tests/Pods
 Tests/Podfile.lock
+Framework/LowlaDB/Pods
+Framework/LowlaDB/Podfile.lock

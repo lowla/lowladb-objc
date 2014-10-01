@@ -23,7 +23,7 @@
 -(void)testItHasTheCorrectVersion
 {
     LDBClient *client = [[LDBClient alloc] init];
-    XCTAssertEqualObjects(client.version, @"0.1.0");
+    XCTAssertEqualObjects(client.version, @"0.0.1");
 }
 
 -(void)testItCanCreateDatabaseReferences
