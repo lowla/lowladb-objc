@@ -190,6 +190,7 @@
 				<string>10.9</string>
 				<key>OTHER_LDFLAGS</key>
 				<array>
+					<string>$(inherited)</string>
 					<string>-all_load</string>
 					<string>-ObjC</string>
 					<string>-framework</string>
@@ -237,6 +238,7 @@
 				<string>10.9</string>
 				<key>OTHER_LDFLAGS</key>
 				<array>
+					<string>$(inherited)</string>
 					<string>-all_load</string>
 					<string>-ObjC</string>
 					<string>-framework</string>
@@ -690,11 +692,7 @@
 				<key>ONLY_ACTIVE_ARCH</key>
 				<string>YES</string>
 				<key>OTHER_LDFLAGS</key>
-				<array>
-					<string>-all_load</string>
-					<string>-ObjC</string>
-					<string>-lc++</string>
-				</array>
+				<string></string>
 				<key>SDKROOT</key>
 				<string>macosx</string>
 				<key>TARGETED_DEVICE_FAMILY</key>
@@ -758,11 +756,7 @@
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
 				<string>7.1</string>
 				<key>OTHER_LDFLAGS</key>
-				<array>
-					<string>-all_load</string>
-					<string>-ObjC</string>
-					<string>-lc++</string>
-				</array>
+				<string></string>
 				<key>SDKROOT</key>
 				<string>macosx</string>
 				<key>TARGETED_DEVICE_FAMILY</key>
@@ -820,6 +814,7 @@
 				<string>Tests/Tests-Info.plist</string>
 				<key>OTHER_LDFLAGS</key>
 				<array>
+					<string>$(inherited)</string>
 					<string>-ObjC</string>
 					<string>-framework</string>
 					<string>Foundation</string>
@@ -865,6 +860,7 @@
 				<string>Tests/Tests-Info.plist</string>
 				<key>OTHER_LDFLAGS</key>
 				<array>
+					<string>$(inherited)</string>
 					<string>-ObjC</string>
 					<string>-framework</string>
 					<string>Foundation</string>
