@@ -13,7 +13,7 @@
 @implementation LDBClient
 
 - (NSString *)version {
-    return [NSString stringWithUTF8String:lowladb_get_version().c_str()];
+	return [NSString stringWithFormat:@"0.0.1 (liblowladb %s)", lowladb_get_version().c_str()];
 }
 
 - (void) dropDatabase:(NSString *)dbName {
