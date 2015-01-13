@@ -12,6 +12,18 @@
 		4D1B9ADA19D5FC89008CFEB7 /* LowlaDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DBF25A919C34C1B0023E58A /* LowlaDB.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D1B9ADB19D5FC8F008CFEB7 /* LDBClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2D8DB719C36ED200D581AA /* LDBClient.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4D2D8DB819C36ED200D581AA /* LDBClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D2D8DB719C36ED200D581AA /* LDBClient.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4D50DB431A5F44900084C915 /* LDBDb.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50DB421A5F44900084C915 /* LDBDb.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4D50DB441A5F44900084C915 /* LDBDb.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50DB421A5F44900084C915 /* LDBDb.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4D50DB541A6061A90084C915 /* LDBCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50DB531A6061A90084C915 /* LDBCollection.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4D50DB551A6061A90084C915 /* LDBCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50DB531A6061A90084C915 /* LDBCollection.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4D50DB571A6061CF0084C915 /* LDBCursor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50DB561A6061CF0084C915 /* LDBCursor.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4D50DB581A6061CF0084C915 /* LDBCursor.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50DB561A6061CF0084C915 /* LDBCursor.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4D50DB5A1A6061F30084C915 /* LDBObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50DB591A6061F30084C915 /* LDBObject.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4D50DB5B1A6061F30084C915 /* LDBObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50DB591A6061F30084C915 /* LDBObject.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4D50DB5D1A6061F90084C915 /* LDBObjectBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50DB5C1A6061F90084C915 /* LDBObjectBuilder.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4D50DB5E1A6061F90084C915 /* LDBObjectBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50DB5C1A6061F90084C915 /* LDBObjectBuilder.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4D50DB601A6062010084C915 /* LDBObjectId.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50DB5F1A6062010084C915 /* LDBObjectId.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4D50DB611A6062010084C915 /* LDBObjectId.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50DB5F1A6062010084C915 /* LDBObjectId.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4DBF259D19C34C1A0023E58A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DBF259C19C34C1A0023E58A /* Cocoa.framework */; };
 		4DBF25A719C34C1B0023E58A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4DBF25A519C34C1B0023E58A /* InfoPlist.strings */; };
 		4DBF25C719C34D4C0023E58A /* LowlaDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DBF25A919C34C1B0023E58A /* LowlaDB.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -26,6 +38,12 @@
 		4D1B9AC319D5FC60008CFEB7 /* LowlaDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LowlaDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D1B9AC619D5FC60008CFEB7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4D2D8DB719C36ED200D581AA /* LDBClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LDBClient.h; path = ../../../Pod/Classes/LDBClient.h; sourceTree = "<group>"; };
+		4D50DB421A5F44900084C915 /* LDBDb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LDBDb.h; path = ../../../Pod/Classes/LDBDb.h; sourceTree = "<group>"; };
+		4D50DB531A6061A90084C915 /* LDBCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LDBCollection.h; path = ../../../Pod/Classes/LDBCollection.h; sourceTree = "<group>"; };
+		4D50DB561A6061CF0084C915 /* LDBCursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LDBCursor.h; path = ../../../Pod/Classes/LDBCursor.h; sourceTree = "<group>"; };
+		4D50DB591A6061F30084C915 /* LDBObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LDBObject.h; path = ../../../Pod/Classes/LDBObject.h; sourceTree = "<group>"; };
+		4D50DB5C1A6061F90084C915 /* LDBObjectBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LDBObjectBuilder.h; path = ../../../Pod/Classes/LDBObjectBuilder.h; sourceTree = "<group>"; };
+		4D50DB5F1A6062010084C915 /* LDBObjectId.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LDBObjectId.h; path = ../../../Pod/Classes/LDBObjectId.h; sourceTree = "<group>"; };
 		4DBF259919C34C1A0023E58A /* LowlaDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LowlaDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DBF259C19C34C1A0023E58A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		4DBF259F19C34C1A0023E58A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -124,7 +142,13 @@
 			isa = PBXGroup;
 			children = (
 				4D2D8DB719C36ED200D581AA /* LDBClient.h */,
+				4D50DB531A6061A90084C915 /* LDBCollection.h */,
 				4DBF25A919C34C1B0023E58A /* LowlaDB.h */,
+				4D50DB561A6061CF0084C915 /* LDBCursor.h */,
+				4D50DB421A5F44900084C915 /* LDBDb.h */,
+				4D50DB591A6061F30084C915 /* LDBObject.h */,
+				4D50DB5C1A6061F90084C915 /* LDBObjectBuilder.h */,
+				4D50DB5F1A6062010084C915 /* LDBObjectId.h */,
 				4DBF25A319C34C1A0023E58A /* Supporting Files */,
 			);
 			path = LowlaDB;
@@ -159,8 +183,14 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D50DB5E1A6061F90084C915 /* LDBObjectBuilder.h in Headers */,
+				4D50DB611A6062010084C915 /* LDBObjectId.h in Headers */,
+				4D50DB5B1A6061F30084C915 /* LDBObject.h in Headers */,
+				4D50DB441A5F44900084C915 /* LDBDb.h in Headers */,
+				4D50DB581A6061CF0084C915 /* LDBCursor.h in Headers */,
 				4D1B9ADA19D5FC89008CFEB7 /* LowlaDB.h in Headers */,
 				4D1B9ADB19D5FC8F008CFEB7 /* LDBClient.h in Headers */,
+				4D50DB551A6061A90084C915 /* LDBCollection.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -168,8 +198,14 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D50DB5D1A6061F90084C915 /* LDBObjectBuilder.h in Headers */,
+				4D50DB601A6062010084C915 /* LDBObjectId.h in Headers */,
+				4D50DB5A1A6061F30084C915 /* LDBObject.h in Headers */,
+				4D50DB431A5F44900084C915 /* LDBDb.h in Headers */,
+				4D50DB571A6061CF0084C915 /* LDBCursor.h in Headers */,
 				4D2D8DB819C36ED200D581AA /* LDBClient.h in Headers */,
 				4DBF25C719C34D4C0023E58A /* LowlaDB.h in Headers */,
+				4D50DB541A6061A90084C915 /* LDBCollection.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

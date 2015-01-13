@@ -113,6 +113,59 @@
 
 @end
 
+@interface LDB_DbTests : XCTestCase
+{
+    LDBClient *client;
+    LDBDb *db;
+}
+
+@end
+
+@implementation LDB_DbTests
+    
+-(void)setUp
+{
+    client = [[LDBClient alloc] init];
+    [client dropDatabase:@"mydb"];
+    db = [client getDatabase:@"mydb"];
+}
+
+-(void)tearDown
+{
+    db = nil;
+    [client dropDatabase:@"mydb"];
+    client = nil;
+}
+
+-(void)testCollectionNames
+{
+    // No collections to start with
+    NSArray *check = [db collectionNames];
+    XCTAssertEqual(0, [check count]);
+    
+    // Create a collection object - this doesn't actually create the collection yet
+    LDBCollection *coll = [db getCollection:@"coll"];
+    check = [db collectionNames];
+    XCTAssertEqual(0, [check count]);
+    
+    // Insert a document - this will create the collection
+    LDBObject *object = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"myfield"] finish];
+    [coll insert:object];
+    check = [db collectionNames];
+    XCTAssertEqual(1, [check count]);
+    XCTAssertEqualObjects(@"coll", [check objectAtIndex:0]);
+    
+    // And another collection
+    coll = [db getCollection:@"coll2.sub"];
+    [coll insert:object];
+    check = [db collectionNames];
+    XCTAssertEqual(2, [check count]);
+    XCTAssertEqualObjects(@"coll", [check objectAtIndex:0]);
+    XCTAssertEqualObjects(@"coll2.sub", [check objectAtIndex:1]);
+}
+
+@end
+
 @interface LDB_BasicInsertAndRetrievalTests : XCTestCase
 {
     LDBClient *client;

@@ -23,6 +23,20 @@
     return [[LDBCollection alloc] initWithDb:self andName:name];
 }
 
+- (NSArray *)collectionNames {
+    NSMutableArray *answer = [NSMutableArray array];
+    [self ensureOpen];
+    
+    std::vector<utf16string> names;
+    self.pdb->collectionNames(&names);
+
+    for (const utf16string &name : names) {
+        [answer addObject:[NSString stringWithUTF8String:name.c_str(utf16string::UTF8)]];
+    }
+    
+    return answer;
+}
+
 - (void)ensureOpen {
     if (nullptr == self.pdb) {
         self.pdb = CLowlaDB::open([self.name UTF8String]);

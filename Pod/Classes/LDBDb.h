@@ -15,5 +15,5 @@
 
 - (id)initWithName:(NSString *)name;
 - (LDBCollection *)getCollection:(NSString *)name;
-
+- (NSArray *)collectionNames;
 @end
