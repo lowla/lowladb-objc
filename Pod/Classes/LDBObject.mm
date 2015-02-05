@@ -11,6 +11,7 @@
 #include "liblowladb/lowladb.h"
 #import "LDBObjectPrivate.h"
 #import "LDBObjectId.h"
+#import "LDBObjectBuilder.h"
 
 @implementation LDBObject
 - (id) initWithData:(NSData *)data {
@@ -24,6 +25,57 @@
         self.data = data;
     }
     return self;
+}
+
++ (id) objectWithDictionary:(NSDictionary *)dict
+{
+    // We sort the keys to ensure consistent behavior
+    NSArray *sortedKeys = [[dict allKeys] sortedArrayUsingSelector:@selector(compare:)];
+    LDBObjectBuilder *builder = [[LDBObjectBuilder alloc] init];
+    [sortedKeys enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if (!([obj isKindOfClass:[NSString class]])) {
+            NSDictionary *info = [NSDictionary dictionaryWithObject:[obj description] forKey:@"key"];
+            NSException *e = [NSException
+                              exceptionWithName:@"InvalidTypeException"
+                              reason:@"All keys must be strings"
+                              userInfo:info];
+            @throw e;
+        }
+        NSString *key = (NSString *)obj;
+        id value = [dict objectForKey:obj];
+        if ([value isKindOfClass:[NSString class]]) {
+            [builder appendString:value forField:key];
+        }
+        else if ([value isKindOfClass:[NSDate class]]) {
+            [builder appendDate:value forField:key];
+        }
+        else if ([value isKindOfClass:[NSDictionary class]]) {
+            [builder appendObject:[LDBObject objectWithDictionary:value] forField:key];
+        }
+        else if ([value isKindOfClass:[NSNumber class]]) {
+            NSNumber *num = (NSNumber *)value;
+            const char *type = [num objCType];
+            if (0 == strcmp(type, @encode(int))) {
+                [builder appendInt:[num intValue] forField:key];
+            }
+            else if (0 == strcmp(type, @encode(long long))) {
+                [builder appendLong:[num longLongValue] forField:key];
+            }
+            else {
+                [builder appendDouble:[num doubleValue] forField:key];
+            }
+        }
+        else {
+            NSDictionary *info = [NSDictionary dictionaryWithObject:key forKey:@"key"];
+            NSException *e = [NSException
+                              exceptionWithName:@"InvalidTypeException"
+                              reason:@"Unsupported object type"
+                              userInfo:info];
+            @throw e;
+            
+        }
+    }];
+    return [builder finish];
 }
 
 - (BOOL)containsField:(NSString *)field {

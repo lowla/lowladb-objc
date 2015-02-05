@@ -1,7 +1,6 @@
 //
 //  LDBCollection.m
 //  lowladb-objc
-//
 //  Created by mark on 7/8/14.
 //
 //
@@ -25,9 +24,18 @@
 
 - (void)ensureOpen {
     [self.db ensureOpen];
-    if (nullptr == self.pcoll) {
-        self.pcoll = self.db.pdb->createCollection([self.name UTF8String]);
+    if (nullptr == _pcoll) {
+        _pcoll = self.db.pdb->createCollection([self.name UTF8String]);
     }
+}
+
+- (CLowlaDBCollection::ptr) pcoll {
+    [self ensureOpen];
+    return _pcoll;
+}
+
+- (void)setPcoll:(CLowlaDBCollection::ptr)pcoll {
+    _pcoll = pcoll;
 }
 
 - (LDBCursor *)find {
@@ -51,6 +59,23 @@
     [self ensureOpen];
     const char *bson = (const char *)[object asBson];
     CLowlaDBWriteResult::ptr wr = self.pcoll->insert(bson);
+    return [[LDBWriteResult alloc] initWithWriteResult:wr];
+}
+
+- (LDBWriteResult *)insertArray:(NSArray *)arr {
+    [self ensureOpen];
+    __block std::vector<const char *> bsonArr;
+    [arr enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if (![obj isKindOfClass:[LDBObject class]]) {
+            NSException *e = [NSException
+                              exceptionWithName:@"InvalidTypeException"
+                              reason:@"All elements must be LDBObjects"
+                              userInfo:nil];
+            @throw e;
+        }
+        bsonArr.push_back((const char *)[obj asBson]);
+    }];
+    CLowlaDBWriteResult::ptr wr = self.pcoll->insert(bsonArr);
     return [[LDBWriteResult alloc] initWithWriteResult:wr];
 }
 

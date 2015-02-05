@@ -166,6 +166,49 @@
 
 @end
 
+@interface LDB_CursorTests : XCTestCase
+{
+    LDBClient *client;
+    LDBDb *db;
+    LDBCollection *coll;
+}
+
+@end
+
+@implementation LDB_CursorTests
+
+-(void)setUp
+{
+    client = [[LDBClient alloc] init];
+    [client dropDatabase:@"mydb"];
+    db = [client getDatabase:@"mydb"];
+    coll = [db getCollection:@"mycoll"];
+}
+
+-(void)tearDown
+{
+    coll = nil;
+    db = nil;
+    [client dropDatabase:@"mydb"];
+    client = nil;
+}
+
+-(void)testCount
+{
+    [coll insert:[LDBObject objectWithDictionary:@{@"a":@1}]];
+    [coll insert:[LDBObject objectWithDictionary:@{@"a":@2}]];
+    [coll insert:[LDBObject objectWithDictionary:@{@"a":@3}]];
+    
+    XCTAssertEqual(3, [[coll find] count]);
+    
+    XCTAssertEqual(1, [[coll find:[LDBObject objectWithDictionary:@{@"a":@2}]] count]);
+    XCTAssertEqual(2, [[[coll find] limit:2] count]);
+    XCTAssertEqual(3, [[[coll find] limit:20] count]);
+}
+
+@end
+
+
 @interface LDB_BasicInsertAndRetrievalTests : XCTestCase
 {
     LDBClient *client;

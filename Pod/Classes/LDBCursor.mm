@@ -19,12 +19,29 @@
 
 @implementation LDBCursor
 
--(id) initWithCollection:(LDBCollection *)coll query:(LDBObject *)query keys:(LDBObject *)keys {
+-(id) initWithImplementation:(CLowlaDBCursor::ptr)pcursor
+{
     if (self = [super init]) {
-        _pcursor = CLowlaDBCursor::create(coll.pcoll);
+        _pcursor = pcursor;
         _readStarted = NO;
     }
     return self;
+}
+
+-(id) initWithCollection:(LDBCollection *)coll query:(LDBObject *)query keys:(LDBObject *)keys
+{
+    const char *queryArg = nullptr;
+    if (query) {
+        queryArg = [query asBson];
+    }
+    CLowlaDBCursor::ptr pcursor = CLowlaDBCursor::create(coll.pcoll, queryArg);
+    return [self initWithImplementation:pcursor];
+}
+
+- (LDBCursor *)limit:(int)limit
+{
+    CLowlaDBCursor::ptr pcursor = _pcursor->limit(limit);
+    return [[LDBCursor alloc] initWithImplementation:pcursor];
 }
 
 -(BOOL) hasNext {
@@ -47,6 +64,10 @@
 -(LDBObject *)one {
     CLowlaDBBson::ptr data = self.pcursor->limit(1)->next();
     return [[LDBObject alloc] initWithBson:data ownedBy:nil];
+}
+
+- (int64_t)count {
+    return self.pcursor->count();
 }
 
 @end
