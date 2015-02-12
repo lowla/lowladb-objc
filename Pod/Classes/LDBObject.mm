@@ -150,6 +150,11 @@
     return self.bson->data();
 }
 
+- (NSString *)asJson {
+    utf16string json = lowladb_bson_to_json(self.bson->data());
+    return [NSString stringWithUTF8String:json.c_str()];
+}
+
 - (BOOL)isEqual:(id)other {
     if (![other isKindOfClass:[LDBObject class]]) {
         return NO;
