@@ -206,6 +206,27 @@
     XCTAssertEqual(3, [[[coll find] limit:20] count]);
 }
 
+-(void)testSort
+{
+    [coll insert:[LDBObject objectWithDictionary:@{@"a":@1, @"b":@1}]];
+    [coll insert:[LDBObject objectWithDictionary:@{@"a":@2, @"b":@20}]];
+    [coll insert:[LDBObject objectWithDictionary:@{@"a":@2, @"b":@30}]];
+    
+    LDBObject *sort = [[[[LDBObjectBuilder builder] appendInt:1 forField:@"a"] appendInt:-1 forField:@"b"] finish];
+    
+    LDBCursor *cursor = [[LDBCursor alloc] initWithCollection:coll query:nil keys:nil];
+    cursor = [cursor sort:sort];
+    LDBObject *doc = [cursor next];
+    XCTAssertEqual(1, [doc intForField:@"a"]);
+    doc = [cursor next];
+    XCTAssertEqual(2, [doc intForField:@"a"]);
+    XCTAssertEqual(30, [doc intForField:@"b"]);
+    doc = [cursor next];
+    XCTAssertEqual(2, [doc intForField:@"a"]);
+    XCTAssertEqual(20, [doc intForField:@"b"]);
+    doc = [cursor next];
+    XCTAssertNil(doc);
+}
 @end
 
 

@@ -44,6 +44,12 @@
     return [[LDBCursor alloc] initWithImplementation:pcursor];
 }
 
+- (LDBCursor *)sort:(LDBObject *)sort
+{
+    CLowlaDBCursor::ptr pcursor = _pcursor->sort([sort asBson]);
+    return [[LDBCursor alloc] initWithImplementation:pcursor];
+}
+
 -(BOOL) hasNext {
     if (!self.readStarted) {
         self.nextRecord = self.pcursor->next();
