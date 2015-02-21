@@ -8,9 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-@class LDBObjectId;
+@class LDBObject;
 
 @interface LDBWriteResult : NSObject
-@property (readonly) LDBObjectId *upsertedId;
+@property (readonly) int documentCount;
+
+-(LDBObject *)document:(int) n;
 
 @end

@@ -261,7 +261,9 @@
 {
     LDBObject *object = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"myfield"] finish];
     LDBWriteResult *wr = [coll insert:object];
-    XCTAssertNotNil(wr.upsertedId);
+    
+    XCTAssertEqual(1, [wr documentCount]);
+    XCTAssertNotNil([[wr document:0] objectIdForField:@"_id"]);
 }
 
 -(void)testItCreatesANewIdForEachDocument
@@ -269,7 +271,8 @@
     LDBObject *object = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"myfield"] finish];
     LDBWriteResult *wr = [coll insert:object];
     LDBWriteResult *wr2 = [coll insert:object];
-    XCTAssertNotEqualObjects(wr.upsertedId, wr2.upsertedId);
+    XCTAssertNotEqualObjects([[wr document:0] objectIdForField:@"_id"],
+                             [[wr2 document:0] objectIdForField:@"_id"]);
 }
 
 -(void)testItCanFindTheFirstDocument
@@ -280,7 +283,7 @@
     NSString *check = [found stringForField:@"myfield"];
     LDBObjectId *checkId = [found objectIdForField:@"_id"];
     XCTAssertEqualObjects(check, @"mystring");
-    XCTAssertEqualObjects(checkId, wr.upsertedId);
+    XCTAssertEqualObjects(checkId, [[wr document:0] objectIdForField:@"_id"]);
 }
 
 -(void)testItCanFindTwoDocuments
@@ -295,8 +298,14 @@
     XCTAssertTrue([cursor hasNext]);
     LDBObject *check2 = [cursor next];
     XCTAssertFalse([cursor hasNext]);
-    XCTAssertEqualObjects([wr1 upsertedId], [check1 objectIdForField:@"_id"]);
-    XCTAssertEqualObjects([wr2 upsertedId], [check2 objectIdForField:@"_id"]);
+    XCTAssertEqualObjects([[wr1 document:0] objectIdForField:@"_id"], [check1 objectIdForField:@"_id"]);
+    XCTAssertEqualObjects([[wr2 document:0] objectIdForField:@"_id"], [check2 objectIdForField:@"_id"]);
 }
 
+-(void)testItCannotInsertDocumentsWithDollarFields
+{
+    LDBObject *object = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"$myfield"] finish];
+    
+    XCTAssertThrowsSpecificNamed([coll insert:object], NSException, NSInvalidArgumentException);
+}
 @end

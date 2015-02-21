@@ -7,22 +7,31 @@
 //
 
 #include "liblowladb/lowladb.h"
-#import "LDBObjectId.h"
+#import "LDBObjectPrivate.h"
 #import "LDBWriteResult.h"
+
+@interface LDBWriteResult ()
+@property CLowlaDBWriteResult::ptr pwr;
+@end
 
 @implementation LDBWriteResult
 
-- (id)initWithWriteResult:(CLowlaDBWriteResult::ptr)wr {
+-(id) initWithImplementation:(CLowlaDBWriteResult::ptr)wr
+{
     if (self = [super init]) {
-        char buffer[CLowlaDBBson::OID_SIZE];
-        if (wr->getUpsertedId(buffer)) {
-            _upsertedId = [[LDBObjectId alloc] initWithBytes:buffer];
-        }
-        else {
-            _upsertedId = nil;
-        }
+        _pwr = wr;
     }
     return self;
+}
+
+- (int)documentCount
+{
+    return self.pwr->documentCount();
+}
+
+-(LDBObject *)document:(int)n
+{
+    return [[LDBObject alloc] initWithBson:self.pwr->document(n) ownedBy:nil];
 }
 
 @end

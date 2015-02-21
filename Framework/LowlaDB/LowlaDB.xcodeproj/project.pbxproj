@@ -28,6 +28,8 @@
 		4DBF25A719C34C1B0023E58A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4DBF25A519C34C1B0023E58A /* InfoPlist.strings */; };
 		4DBF25C719C34D4C0023E58A /* LowlaDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DBF25A919C34C1B0023E58A /* LowlaDB.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4DBF25CF19C367B20023E58A /* Main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF25CD19C367B20023E58A /* Main.m */; };
+		4DEB149D1A98007800FBC868 /* LDBWriteResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DEB149C1A98007800FBC868 /* LDBWriteResult.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4DEB149E1A98007800FBC868 /* LDBWriteResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DEB149C1A98007800FBC868 /* LDBWriteResult.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E4CEB1C5F08B21EDAF7BA406 /* libPods-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0F3C06A226784F31D0AB842 /* libPods-ios.a */; };
 /* End PBXBuildFile section */
 
@@ -54,6 +56,7 @@
 		4DBF25A819C34C1B0023E58A /* LowlaDB-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LowlaDB-Prefix.pch"; sourceTree = "<group>"; };
 		4DBF25A919C34C1B0023E58A /* LowlaDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LowlaDB.h; sourceTree = "<group>"; };
 		4DBF25CD19C367B20023E58A /* Main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Main.m; sourceTree = "<group>"; };
+		4DEB149C1A98007800FBC868 /* LDBWriteResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LDBWriteResult.h; path = ../../../Pod/Classes/LDBWriteResult.h; sourceTree = "<group>"; };
 		64AB1913581035F3F1D31967 /* Pods-ios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ios/Pods-ios.debug.xcconfig"; sourceTree = "<group>"; };
 		B8611AFE10ABB1269E133F71 /* libPods-osx.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-osx.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F0F3C06A226784F31D0AB842 /* libPods-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -149,6 +152,7 @@
 				4D50DB591A6061F30084C915 /* LDBObject.h */,
 				4D50DB5C1A6061F90084C915 /* LDBObjectBuilder.h */,
 				4D50DB5F1A6062010084C915 /* LDBObjectId.h */,
+				4DEB149C1A98007800FBC868 /* LDBWriteResult.h */,
 				4DBF25A319C34C1A0023E58A /* Supporting Files */,
 			);
 			path = LowlaDB;
@@ -183,6 +187,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4DEB149E1A98007800FBC868 /* LDBWriteResult.h in Headers */,
 				4D50DB5E1A6061F90084C915 /* LDBObjectBuilder.h in Headers */,
 				4D50DB611A6062010084C915 /* LDBObjectId.h in Headers */,
 				4D50DB5B1A6061F30084C915 /* LDBObject.h in Headers */,
@@ -198,6 +203,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4DEB149D1A98007800FBC868 /* LDBWriteResult.h in Headers */,
 				4D50DB5D1A6061F90084C915 /* LDBObjectBuilder.h in Headers */,
 				4D50DB601A6062010084C915 /* LDBObjectId.h in Headers */,
 				4D50DB5A1A6061F30084C915 /* LDBObject.h in Headers */,

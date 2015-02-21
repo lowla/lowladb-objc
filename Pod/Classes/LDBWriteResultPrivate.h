@@ -3,7 +3,7 @@
 class CLowlaDBWriteResult;
 
 @interface LDBWriteResult ()
-- (id) initWithWriteResult:(CLowlaDBWriteResult::ptr)wr;
+- (id) initWithImplementation:(CLowlaDBWriteResult::ptr)wr;
 
 @end
 

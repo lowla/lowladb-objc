@@ -5,6 +5,7 @@
 //
 //
 
+#import "liblowladb/TeamstudioException.h"
 #import "liblowladb/lowladb.h"
 #import "LDBCollectionPrivate.h"
 #import "LDBCursor.h"
@@ -58,8 +59,17 @@
 - (LDBWriteResult *) insert:(LDBObject *)object {
     [self ensureOpen];
     const char *bson = (const char *)[object asBson];
-    CLowlaDBWriteResult::ptr wr = self.pcoll->insert(bson);
-    return [[LDBWriteResult alloc] initWithWriteResult:wr];
+    try {
+        CLowlaDBWriteResult::ptr wr = self.pcoll->insert(bson);
+        return [[LDBWriteResult alloc] initWithImplementation:wr];
+    }
+    catch (TeamstudioException &e) {
+        NSException *ex = [NSException
+                          exceptionWithName:NSInvalidArgumentException
+                          reason:@(e.what())
+                          userInfo:nil];
+        @throw ex;
+    }
 }
 
 - (LDBWriteResult *)insertArray:(NSArray *)arr {
@@ -76,14 +86,14 @@
         bsonArr.push_back((const char *)[obj asBson]);
     }];
     CLowlaDBWriteResult::ptr wr = self.pcoll->insert(bsonArr);
-    return [[LDBWriteResult alloc] initWithWriteResult:wr];
+    return [[LDBWriteResult alloc] initWithImplementation:wr];
 }
 
 - (LDBWriteResult *)save:(LDBObject *)object {
     [self ensureOpen];
     const char *bson = [object asBson];
     CLowlaDBWriteResult::ptr wr = self.pcoll->save(bson);
-    return [[LDBWriteResult alloc] initWithWriteResult:wr];
+    return [[LDBWriteResult alloc] initWithImplementation:wr];
 }
 
 - (LDBWriteResult *)update:(LDBObject *)query object:(LDBObject *)object {
@@ -95,7 +105,7 @@
     const char *queryBson = [query asBson];
     const char *objectBson = [object asBson];
     CLowlaDBWriteResult::ptr wr = self.pcoll->update(queryBson, objectBson, upsert, multi);
-    return [[LDBWriteResult alloc] initWithWriteResult:wr];
+    return [[LDBWriteResult alloc] initWithImplementation:wr];
 }
 
 - (LDBWriteResult *)updateMulti:(LDBObject *)query object:(LDBObject *)object {
