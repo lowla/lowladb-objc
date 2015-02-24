@@ -89,6 +89,16 @@
     return [[LDBWriteResult alloc] initWithImplementation:wr];
 }
 
+- (LDBWriteResult *)remove:(LDBObject *)query {
+    [self ensureOpen];
+    const char *bson = nullptr;
+    if (query) {
+        bson = [query asBson];
+    }
+    CLowlaDBWriteResult::ptr wr = self.pcoll->remove(bson);
+    return [[LDBWriteResult alloc] initWithImplementation:wr];
+}
+
 - (LDBWriteResult *)save:(LDBObject *)object {
     [self ensureOpen];
     const char *bson = [object asBson];

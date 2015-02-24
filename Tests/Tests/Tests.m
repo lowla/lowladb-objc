@@ -230,7 +230,7 @@
 @end
 
 
-@interface LDB_BasicInsertAndRetrievalTests : XCTestCase
+@interface LDB_CollectionTests : XCTestCase
 {
     LDBClient *client;
     LDBDb *db;
@@ -239,7 +239,7 @@
 
 @end
 
-@implementation LDB_BasicInsertAndRetrievalTests
+@implementation LDB_CollectionTests
 
 -(void)setUp
 {
@@ -308,4 +308,44 @@
     
     XCTAssertThrowsSpecificNamed([coll insert:object], NSException, NSInvalidArgumentException);
 }
+
+-(void)testItCanRemoveADocument
+{
+    LDBObject *object1 = [[[LDBObjectBuilder builder] appendInt:1 forField:@"a"] finish];
+    [coll insert:object1];
+    LDBObject *object2 = [[[LDBObjectBuilder builder] appendInt:2 forField:@"a"] finish];
+    [coll insert:object2];
+    LDBObject *object3 = [[[LDBObjectBuilder builder] appendInt:3 forField:@"a"] finish];
+    [coll insert:object3];
+    
+    LDBObject *query = [[[LDBObjectBuilder builder] appendInt:2 forField:@"a"] finish];
+    LDBWriteResult *wr = [coll remove:query];
+    XCTAssertEqual(1, [wr documentCount]);
+    
+    LDBCursor *cursor = [coll find];
+    LDBObject *doc = [cursor next];
+    XCTAssertEqual(1, [doc intForField:@"a"]);
+    doc = [cursor next];
+    XCTAssertEqual(3, [doc intForField:@"a"]);
+    doc = [cursor next];
+    XCTAssertNil(doc);
+}
+
+-(void)testItCanRemoveAllDocuments
+{
+    LDBObject *object1 = [[[LDBObjectBuilder builder] appendInt:1 forField:@"a"] finish];
+    [coll insert:object1];
+    LDBObject *object2 = [[[LDBObjectBuilder builder] appendInt:2 forField:@"a"] finish];
+    [coll insert:object2];
+    LDBObject *object3 = [[[LDBObjectBuilder builder] appendInt:3 forField:@"a"] finish];
+    [coll insert:object3];
+    
+    LDBWriteResult *wr = [coll remove:nil];
+    XCTAssertEqual(3, [wr documentCount]);
+    
+    LDBCursor *cursor = [coll find];
+    LDBObject *doc = [cursor next];
+    XCTAssertNil(doc);
+}
+
 @end
