@@ -50,6 +50,12 @@
     return [[LDBCursor alloc] initWithImplementation:pcursor];
 }
 
+- (LDBCursor *)showPending
+{
+    CLowlaDBCursor::ptr pcursor = _pcursor->showPending();
+    return [[LDBCursor alloc] initWithImplementation:pcursor];
+}
+
 -(BOOL) hasNext {
     if (!self.readStarted) {
         self.nextRecord = self.pcursor->next();
