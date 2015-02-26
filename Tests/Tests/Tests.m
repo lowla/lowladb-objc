@@ -111,6 +111,20 @@
     XCTAssertEqual([obj longForField:@"myfield"], 314000000000000);
 }
 
+-(void)testItCanReadObjectIdsFromADictionary
+{
+    NSMutableDictionary *subObj = [NSMutableDictionary dictionary];
+    [subObj setObject:@"ObjectId" forKey:@"_bsonType"];
+    [subObj setObject:@"0123456789abcdef01234567" forKey:@"hexString"];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    [dict setObject:subObj forKey:@"_id"];
+    
+    LDBObject *obj = [LDBObject objectWithDictionary:dict];
+    XCTAssertTrue([obj containsField:@"_id"]);
+    LDBObjectId *oid = [obj objectIdForField:@"_id"];
+    XCTAssertNotNil(oid);
+    XCTAssertEqualObjects([oid hexString], @"0123456789abcdef01234567");
+}
 @end
 
 @interface LDB_DbTests : XCTestCase
@@ -307,6 +321,15 @@
     LDBObject *object = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"$myfield"] finish];
     
     XCTAssertThrowsSpecificNamed([coll insert:object], NSException, NSInvalidArgumentException);
+}
+
+-(void)testItCannotInsertDocumentsWithDollarFieldsViaArray
+{
+    LDBObject *object = [[[LDBObjectBuilder builder] appendString:@"mystring" forField:@"$myfield"] finish];
+
+    NSArray *arr = [NSArray arrayWithObjects:object, object, nil];
+    XCTAssertThrowsSpecificNamed([coll insertArray:arr], NSException, NSInvalidArgumentException);
+    
 }
 
 -(void)testItCanRemoveADocument

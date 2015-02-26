@@ -85,8 +85,17 @@
         }
         bsonArr.push_back((const char *)[obj asBson]);
     }];
-    CLowlaDBWriteResult::ptr wr = self.pcoll->insert(bsonArr);
-    return [[LDBWriteResult alloc] initWithImplementation:wr];
+    try {
+        CLowlaDBWriteResult::ptr wr = self.pcoll->insert(bsonArr);
+        return [[LDBWriteResult alloc] initWithImplementation:wr];
+    }
+    catch (TeamstudioException &e) {
+        NSException *ex = [NSException
+                           exceptionWithName:NSInvalidArgumentException
+                           reason:@(e.what())
+                           userInfo:nil];
+        @throw ex;
+    }
 }
 
 - (LDBWriteResult *)remove:(LDBObject *)query {
@@ -114,8 +123,17 @@
     [self ensureOpen];
     const char *queryBson = [query asBson];
     const char *objectBson = [object asBson];
-    CLowlaDBWriteResult::ptr wr = self.pcoll->update(queryBson, objectBson, upsert, multi);
-    return [[LDBWriteResult alloc] initWithImplementation:wr];
+    try {
+        CLowlaDBWriteResult::ptr wr = self.pcoll->update(queryBson, objectBson, upsert, multi);
+        return [[LDBWriteResult alloc] initWithImplementation:wr];
+    }
+    catch (TeamstudioException const &e) {
+        NSException *ex = [NSException
+                           exceptionWithName:NSInvalidArgumentException
+                           reason:@(e.what())
+                           userInfo:nil];
+        @throw ex;
+    }
 }
 
 - (LDBWriteResult *)updateMulti:(LDBObject *)query object:(LDBObject *)object {

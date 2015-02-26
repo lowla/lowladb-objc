@@ -50,7 +50,21 @@
             [builder appendDate:value forField:key];
         }
         else if ([value isKindOfClass:[NSDictionary class]]) {
-            [builder appendObject:[LDBObject objectWithDictionary:value] forField:key];
+            id bsonType = [value objectForKey:@"_bsonType"];
+            if (bsonType) {
+                NSString *type = [bsonType description];
+                if ([type isEqualToString:@"ObjectId"]) {
+                    id hexString = [value objectForKey:@"hexString"];
+                    if (hexString) {
+                        NSString *hex = [hexString description];
+                        LDBObjectId *oid = [[LDBObjectId alloc] initWithHexString:hex];
+                        [builder appendObjectId:oid forField:key];
+                    }
+                }
+            }
+            else {
+                [builder appendObject:[LDBObject objectWithDictionary:value] forField:key];
+            }
         }
         else if ([value isKindOfClass:[NSNumber class]]) {
             NSNumber *num = (NSNumber *)value;

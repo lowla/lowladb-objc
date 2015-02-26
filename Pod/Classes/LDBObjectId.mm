@@ -27,8 +27,20 @@
     return self;
 }
 
+- (id)initWithHexString:(NSString *)hex {
+    char oid[CLowlaDBBson::OID_SIZE];
+    CLowlaDBBson::oidFromString(oid, [hex UTF8String]);
+    return [self initWithBytes:oid];
+}
+
 - (const void *)bytes {
     return [self.data bytes];
+}
+
+- (NSString *)hexString {
+    char buffer[25];
+    CLowlaDBBson::oidToString((char *)[self.data bytes], buffer);
+    return [NSString stringWithUTF8String:buffer];
 }
 
 - (BOOL)isEqual:(id)other {
