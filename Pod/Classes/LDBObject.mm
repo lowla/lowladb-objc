@@ -105,7 +105,13 @@
 }
 
 - (NSString *)stringForField:(NSString *)field {
-    return [NSString stringWithUTF8String:self.bson->stringForKey([field UTF8String]).c_str(utf16string::UTF8)];
+    const char *str;
+    if (self.bson->stringForKey([field UTF8String], &str)) {
+        return [NSString stringWithUTF8String:str];
+    }
+    else {
+        return [NSString stringWithUTF8String:""];
+    }
 }
 
 - (LDBObject *)objectForField:(NSString *)field {

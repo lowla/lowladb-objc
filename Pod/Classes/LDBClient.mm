@@ -27,4 +27,9 @@
 - (NSArray *)getDatabaseNames {
     return nil;
 }
+
+- (void)loadJson:(NSString *)json {
+    lowladb_load_json([json UTF8String]);
+}
+
 @end
