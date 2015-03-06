@@ -10,7 +10,25 @@
 #import "LDBDb.h"
 #import "LDBClient.h"
 
+NSString *LDBClientDidChangeCollectionNotification = @"LDBClientDidChangeCollectionNotification";
+
+void listener(void *user, const char *ns) {
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    NSDictionary *userInfo = @{@"ns": [NSString stringWithUTF8String:ns]};
+    [nc postNotificationName:LDBClientDidChangeCollectionNotification object:nil userInfo:userInfo];
+}
+
 @implementation LDBClient
+
++ (void)enableNotifications:(BOOL)enable
+{
+    if (enable) {
+        lowladb_add_collection_listener(listener, nullptr);
+    }
+    else {
+        lowladb_remove_collection_listener(listener);
+    }
+}
 
 - (NSString *)version {
 	return [NSString stringWithFormat:@"0.0.1 (liblowladb %s)", lowladb_get_version().c_str()];
