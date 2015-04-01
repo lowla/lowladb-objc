@@ -371,4 +371,26 @@
     XCTAssertNil(doc);
 }
 
+- (void) testItCanUpdateADocument
+{
+    LDBObject *object1 = [[[LDBObjectBuilder builder] appendInt:1 forField:@"a"] finish];
+    [coll insert:object1];
+    LDBObject *object2 = [[[LDBObjectBuilder builder] appendInt:2 forField:@"a"] finish];
+    [coll insert:object2];
+    
+    LDBObject *query = [[[LDBObjectBuilder builder] appendInt:2 forField:@"a"] finish];
+    LDBObject *update = [[[LDBObjectBuilder builder] appendInt:3 forField:@"a"] finish];
+
+    LDBWriteResult *wr = [coll update:query object:update];
+    XCTAssertEqual(1, [wr documentCount]);
+
+    LDBCursor *cursor = [coll find];
+    LDBObject *obj = [cursor next];
+    XCTAssertEqual(1, [obj intForField:@"a"]);
+    obj = [cursor next];
+    XCTAssertEqual(3, [obj intForField:@"a"]);
+    obj = [cursor next];
+    XCTAssertNil(obj);
+}
+
 @end
