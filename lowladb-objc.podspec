@@ -9,11 +9,11 @@
 
 Pod::Spec.new do |s|
   s.name             = "lowladb-objc"
-  s.version          = "0.0.1"
+  s.version          = "0.0.2"
   s.summary          = "Objective C wrapper for the LowlaDB database engine."
   s.homepage         = "https://github.com/lowla/lowladb-objc"
   s.license          = 'MIT'
-  s.author           = { "Mark Dixon" => "mark_dixon@teamstudio.com" }
+  s.author           = { "Mark Dixon" => "mark@lowla.io" }
   s.source           = { :git => "https://github.com/lowla/lowladb-objc.git", :tag => s.version.to_s }
 
   s.ios.deployment_target = '6.0'
@@ -23,4 +23,5 @@ Pod::Spec.new do |s|
   s.source_files = 'Pod/Classes'
 
   s.dependency 'liblowladb'
+  s.dependency 'AFNetworking', '>2'
 end

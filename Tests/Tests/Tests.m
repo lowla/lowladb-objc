@@ -394,3 +394,157 @@
 }
 
 @end
+
+// Trivial mock http 'server' that records any requests made and sends back prepared json responses.
+@interface LDBMockServer : NSObject
+{
+}
+@property int requestCount;
+@property NSMutableArray *requests;
+@property NSMutableArray *responses;
+
+- (id)init;
+- (void)handleRequest:(NSURLProtocol *)protocol;
+@end
+
+@implementation LDBMockServer
+
+- (id)init {
+    if ((self = [super init])) {
+        _requestCount = 0;
+        _requests = [NSMutableArray array];
+        _responses = [NSMutableArray array];
+    }
+    return self;
+}
+
+- (void)handleRequest:(NSURLProtocol *)protocol {
+    [self.requests addObject:[protocol request]];
+    if (self.requestCount < [self.responses count]) {
+        NSData *responseData = (NSData *)[self.responses objectAtIndex:self.requestCount];
+        NSHTTPURLResponse *response = [[NSHTTPURLResponse alloc] initWithURL:[protocol.request URL] MIMEType:@"application/json" expectedContentLength: [responseData length] textEncodingName:@"UTF8"];
+        [protocol.client URLProtocol:protocol didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
+        [protocol.client URLProtocol:protocol didLoadData:responseData];
+        [protocol.client URLProtocolDidFinishLoading:protocol];
+    }
+    else {
+        NSError *error = [NSError errorWithDomain:@"LDBServer ran out of responses" code:0 userInfo:nil];
+        [protocol.client URLProtocol:protocol didFailWithError:error];
+    }
+    ++self.requestCount;
+}
+
+@end
+
+static LDBMockServer *server;
+
+@interface LDBSyncTestProtocol : NSURLProtocol
+{
+}
+@end
+
+@implementation LDBSyncTestProtocol
+
++ (BOOL)canInitWithRequest:(NSURLRequest *)request {
+    return [[[request URL] scheme] isEqualToString:@"test"];
+}
+
++ (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request {
+    return request;
+}
+
+- (void)startLoading {
+    [server handleRequest:self];
+}
+
+- (void)stopLoading {
+}
+
+@end
+
+@interface LDB_SyncTests : LDB_CollectionTests
+{
+}
+@end
+
+@implementation LDB_SyncTests
+
+- (void) setUp {
+    [super setUp];
+    [NSURLProtocol registerClass:[LDBSyncTestProtocol class]];
+    server = [[LDBMockServer alloc] init];
+    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:LDBClientSequenceProperty];
+}
+
+- (void) tearDown {
+    server = nil;
+    [NSURLProtocol unregisterClass:[LDBSyncTestProtocol class]];
+    [super tearDown];
+}
+
+- (void) pushResponse:(NSString *)json {
+    [server.responses addObject:[json dataUsingEncoding:NSUTF8StringEncoding]];
+}
+
+- (NSString *) requestUrl:(int) index {
+    return [[((NSURLRequest *)[server.requests objectAtIndex:index]) URL] description];
+}
+
+- (long) lastSequence {
+    return [[NSUserDefaults standardUserDefaults] integerForKey:LDBClientSequenceProperty];
+}
+
+- (void) testNoOpSync
+{
+    XCTestExpectation *te = [self expectationWithDescription:@"Sync complete"];
+
+    [self pushResponse:@"{ \"atoms\" : [], \"sequence\" : 2}"];
+    
+    [LDBClient sync:@"test://" notify:^(LDBSyncStatus status, NSString *message) {
+        if (LDBSyncStatus_ERROR == status || LDBSyncStatus_OK == status) {
+            XCTAssertEqual(LDBSyncStatus_OK, status);
+            [te fulfill];
+        }
+    }];
+    
+    [self waitForExpectationsWithTimeout:10000 handler:^(NSError *error) {
+        // No pushes, no pulls, just the changes request
+        XCTAssertEqual(1, server.requestCount);
+        XCTAssertEqualObjects(@"test:///_lowla/changes?seq=0", [self requestUrl:0]);
+        XCTAssertEqual(2, [self lastSequence]);
+    }];
+}
+
+- (void) testOnePullSync
+{
+    XCTestExpectation *te = [self expectationWithDescription:@"Sync complete"];
+    
+    [self pushResponse:@"{ \"atoms\" : [{ \"id\" : \"mydb.mycoll$1\", \"sequence\" : 1, \"version\" : 1, \"deleted\" : false, \"clientNs\" : \"mydb.mycoll\" }], \"sequence\" : 2}"];
+    [self pushResponse:@"[{ \"id\" : \"mydb.mycoll$1\", \"clientNs\" : \"mydb.mycoll\" }, { \"_id\" : \"1\", \"myfield\" : \"myvalue\" }]"];
+    [self pushResponse:@"{ \"atoms\" : [], \"sequence\" : 2}"];
+    
+    [LDBClient sync:@"test://" notify:^(LDBSyncStatus status, NSString *message) {
+        if (LDBSyncStatus_ERROR == status || LDBSyncStatus_OK == status) {
+            XCTAssertEqual(LDBSyncStatus_OK, status);
+            XCTAssertEqual(2, [self lastSequence]);
+            // And sync again to make sure we don't try to push up the new record
+            [LDBClient sync:@"test://" notify:^(LDBSyncStatus status, NSString *message) {
+                if (LDBSyncStatus_ERROR == status || LDBSyncStatus_OK == status) {
+                    XCTAssertEqual(LDBSyncStatus_OK, status);
+                    [te fulfill];
+                }
+            }];
+        }
+    }];
+    
+    [self waitForExpectationsWithTimeout:10000 handler:^(NSError *error) {
+        // The first sync has two requests: changes and pull
+        // The second sync has one: changes
+        XCTAssertEqual(3, server.requestCount);
+        XCTAssertEqualObjects(@"test:///_lowla/changes?seq=0", [self requestUrl:0]);
+        XCTAssertEqualObjects(@"test:///_lowla/pull", [self requestUrl:1]);
+        XCTAssertEqualObjects(@"test:///_lowla/changes?seq=2", [self requestUrl:2]);
+        XCTAssertEqual(2, [self lastSequence]);
+    }];
+}
+@end
