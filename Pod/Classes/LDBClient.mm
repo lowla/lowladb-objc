@@ -58,6 +58,14 @@ static void pullChunk(NSString *server, CLowlaDBPullData::ptr pd, SyncNotifier n
     
     NSString *url = [NSString stringWithFormat:@"%@/_lowla/pull", server];
     
+    // If the only remaining actions are deletions, there may be no documents to pull even tho the pull isn't yet complete.
+    // To save wasting time on an empty request, we can just process the empty response the server would have sent.
+    if (!pullRequestBson) {
+        lowladb_apply_json_pull_response("[]", pd);
+        pullChunk(server, pd, notify);
+        return;
+    }
+    
     doPost(url, pullRequestBson, ^(id responseObject) {
         const char *json = (const char *)[((NSData *)responseObject) bytes];
         lowladb_apply_json_pull_response(json, pd);

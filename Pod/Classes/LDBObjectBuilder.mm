@@ -70,6 +70,16 @@
     return self;
 }
 
+- (LDBObjectBuilder *)startArrayForField:(NSString *)field {
+    self.bson->startArray([field UTF8String]);
+    return self;
+}
+
+- (LDBObjectBuilder *)finishArray {
+    self.bson->finishArray();
+    return self;
+}
+
 - (LDBObject *)finish {
     self.bson->finish();
     return [[LDBObject alloc] initWithBson:self.bson ownedBy:nil];

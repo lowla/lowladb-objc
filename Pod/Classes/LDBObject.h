@@ -19,6 +19,7 @@
 - (double)doubleForField:(NSString *)field;
 - (NSString *)stringForField:(NSString *)field;
 - (LDBObject *)objectForField:(NSString *)field;
+- (LDBObject *)arrayForField:(NSString *)field;
 - (LDBObjectId *)objectIdForField:(NSString *)field;
 - (BOOL)boolForField:(NSString *)field;
 - (NSDate *)dateForField:(NSString *)field;

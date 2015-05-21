@@ -111,6 +111,14 @@
     XCTAssertEqual([obj longForField:@"myfield"], 314000000000000);
 }
 
+-(void)testItCanBuildArrays
+{
+    LDBObject *obj = [[[[[LDBObjectBuilder builder] startArrayForField:@"myarr"] appendInt:5 forField:@"0"] finishArray] finish];
+    XCTAssert([obj containsField:@"myarr"]);
+    LDBObject *arr = [obj arrayForField:@"myarr"];
+    XCTAssertEqual([arr intForField:@"0"], 5);
+}
+
 -(void)testItCanReadObjectIdsFromADictionary
 {
     NSMutableDictionary *subObj = [NSMutableDictionary dictionary];
@@ -125,6 +133,20 @@
     XCTAssertNotNil(oid);
     XCTAssertEqualObjects([oid hexString], @"0123456789abcdef01234567");
 }
+
+-(void)testItCanReadArraysFromADictionary
+{
+    NSMutableArray *arr = [NSMutableArray array];
+    [arr addObject:@"mystring"];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    [dict setObject:arr forKey:@"myarr"];
+    
+    LDBObject *obj = [LDBObject objectWithDictionary:dict];
+    XCTAssertTrue([obj containsField:@"myarr"]);
+    LDBObject *sub = [obj arrayForField:@"myarr"];
+    XCTAssertEqualObjects([sub stringForField:@"0"], @"mystring");
+}
+
 @end
 
 @interface LDB_DbTests : XCTestCase
@@ -545,6 +567,27 @@ static LDBMockServer *server;
         XCTAssertEqualObjects(@"test:///_lowla/pull", [self requestUrl:1]);
         XCTAssertEqualObjects(@"test:///_lowla/changes?seq=2", [self requestUrl:2]);
         XCTAssertEqual(2, [self lastSequence]);
+    }];
+}
+
+- (void) testOneDeletionChangeDoesntPull
+{
+    XCTestExpectation *te = [self expectationWithDescription:@"Sync complete"];
+    
+    [self pushResponse:@"{ \"atoms\" : [{ \"id\" : \"mydb.mycoll$1\", \"sequence\" : 1, \"version\" : 1, \"deleted\" : true, \"clientNs\" : \"mydb.mycoll\" }], \"sequence\" : 2}"];
+    
+    [LDBClient sync:@"test://" notify:^(LDBSyncStatus status, NSString *message) {
+        if (LDBSyncStatus_ERROR == status || LDBSyncStatus_OK == status) {
+            XCTAssertEqual(LDBSyncStatus_OK, status);
+            XCTAssertEqual(2, [self lastSequence]);
+            [te fulfill];
+        }
+    }];
+
+    [self waitForExpectationsWithTimeout:10000 handler:^(NSError *error) {
+        // As an optimization, we shouldn't try to pull 0 records from the adapter. So there should only be the changes request
+        XCTAssertEqual(1, server.requestCount);
+        XCTAssertEqualObjects(@"test:///_lowla/changes?seq=0", [self requestUrl:0]);
     }];
 }
 @end

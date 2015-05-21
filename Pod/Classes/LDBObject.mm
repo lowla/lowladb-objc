@@ -13,6 +13,63 @@
 #import "LDBObjectId.h"
 #import "LDBObjectBuilder.h"
 
+static void appendValueToBuilder(NSString *key, id value, LDBObjectBuilder *builder) {
+    if ([value isKindOfClass:[NSString class]]) {
+        [builder appendString:value forField:key];
+    }
+    else if ([value isKindOfClass:[NSDate class]]) {
+        [builder appendDate:value forField:key];
+    }
+    else if ([value isKindOfClass:[NSDictionary class]]) {
+        id bsonType = [value objectForKey:@"_bsonType"];
+        if (bsonType) {
+            NSString *type = [bsonType description];
+            if ([type isEqualToString:@"ObjectId"]) {
+                id hexString = [value objectForKey:@"hexString"];
+                if (hexString) {
+                    NSString *hex = [hexString description];
+                    LDBObjectId *oid = [[LDBObjectId alloc] initWithHexString:hex];
+                    [builder appendObjectId:oid forField:key];
+                }
+            }
+        }
+        else {
+            [builder appendObject:[LDBObject objectWithDictionary:value] forField:key];
+        }
+    }
+    else if ([value isKindOfClass:[NSNumber class]]) {
+        NSNumber *num = (NSNumber *)value;
+        const char *type = [num objCType];
+        if (0 == strcmp(type, @encode(int))) {
+            [builder appendInt:[num intValue] forField:key];
+        }
+        else if (0 == strcmp(type, @encode(long long))) {
+            [builder appendLong:[num longLongValue] forField:key];
+        }
+        else {
+            [builder appendDouble:[num doubleValue] forField:key];
+        }
+    }
+    else if ([value isKindOfClass:[NSArray class]]) {
+        NSArray *arr = (NSArray *)value;
+        [builder startArrayForField:key];
+        [arr enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            NSString *elem = [NSString stringWithFormat:@"%lu", (unsigned long)idx];
+            appendValueToBuilder(elem, obj, builder);
+        }];
+        [builder finishArray];
+    }
+    else {
+        NSDictionary *info = [NSDictionary dictionaryWithObject:key forKey:@"key"];
+        NSException *e = [NSException
+                          exceptionWithName:@"InvalidTypeException"
+                          reason:@"Unsupported object type"
+                          userInfo:info];
+        @throw e;
+        
+    }
+}
+
 @implementation LDBObject
 - (id) initWithData:(NSData *)data {
     CLowlaDBBson::ptr bson = CLowlaDBBson::create((char *)[data bytes], false);
@@ -43,51 +100,7 @@
         }
         NSString *key = (NSString *)obj;
         id value = [dict objectForKey:obj];
-        if ([value isKindOfClass:[NSString class]]) {
-            [builder appendString:value forField:key];
-        }
-        else if ([value isKindOfClass:[NSDate class]]) {
-            [builder appendDate:value forField:key];
-        }
-        else if ([value isKindOfClass:[NSDictionary class]]) {
-            id bsonType = [value objectForKey:@"_bsonType"];
-            if (bsonType) {
-                NSString *type = [bsonType description];
-                if ([type isEqualToString:@"ObjectId"]) {
-                    id hexString = [value objectForKey:@"hexString"];
-                    if (hexString) {
-                        NSString *hex = [hexString description];
-                        LDBObjectId *oid = [[LDBObjectId alloc] initWithHexString:hex];
-                        [builder appendObjectId:oid forField:key];
-                    }
-                }
-            }
-            else {
-                [builder appendObject:[LDBObject objectWithDictionary:value] forField:key];
-            }
-        }
-        else if ([value isKindOfClass:[NSNumber class]]) {
-            NSNumber *num = (NSNumber *)value;
-            const char *type = [num objCType];
-            if (0 == strcmp(type, @encode(int))) {
-                [builder appendInt:[num intValue] forField:key];
-            }
-            else if (0 == strcmp(type, @encode(long long))) {
-                [builder appendLong:[num longLongValue] forField:key];
-            }
-            else {
-                [builder appendDouble:[num doubleValue] forField:key];
-            }
-        }
-        else {
-            NSDictionary *info = [NSDictionary dictionaryWithObject:key forKey:@"key"];
-            NSException *e = [NSException
-                              exceptionWithName:@"InvalidTypeException"
-                              reason:@"Unsupported object type"
-                              userInfo:info];
-            @throw e;
-            
-        }
+        appendValueToBuilder(key, value, builder);
     }];
     return [builder finish];
 }
@@ -117,6 +130,16 @@
 - (LDBObject *)objectForField:(NSString *)field {
     CLowlaDBBson::ptr obj;
     if (self.bson->objectForKey([field UTF8String], &obj)) {
+        return [[LDBObject alloc] initWithBson:obj ownedBy:nil];
+    }
+    else {
+        return nil;
+    }
+}
+
+- (LDBObject *)arrayForField:(NSString *)field {
+    CLowlaDBBson::ptr obj;
+    if (self.bson->arrayForKey([field UTF8String], &obj)) {
         return [[LDBObject alloc] initWithBson:obj ownedBy:nil];
     }
     else {

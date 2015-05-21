@@ -23,5 +23,8 @@
 - (LDBObjectBuilder *)appendInt:(int)value forField:(NSString *)field;
 - (LDBObjectBuilder *)appendLong:(int64_t)value forField:(NSString *)field;
 
+- (LDBObjectBuilder *)startArrayForField:(NSString *)field;
+- (LDBObjectBuilder *)finishArray;
+
 - (LDBObject *)finish;
 @end
