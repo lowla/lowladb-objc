@@ -173,6 +173,15 @@ static void appendValueToBuilder(NSString *key, id value, LDBObjectBuilder *buil
     return nil;
 }
 
+// Internal method for unit tests
+- (int64_t)dateRawForField:(NSString *)field {
+    int64_t answer;
+    if (self.bson->dateForKey([field UTF8String], &answer)) {
+        return answer;
+    }
+    return 0;
+}
+
 - (int)intForField:(NSString *)field {
     int answer;
     if (self.bson->intForKey([field UTF8String], &answer)) {

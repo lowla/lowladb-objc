@@ -23,6 +23,7 @@
 - (LDBObjectId *)objectIdForField:(NSString *)field;
 - (BOOL)boolForField:(NSString *)field;
 - (NSDate *)dateForField:(NSString *)field;
+- (int64_t)dateRawForField:(NSString *)field;
 - (int)intForField:(NSString *)field;
 - (int64_t)longForField:(NSString *)field;
 

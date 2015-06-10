@@ -89,12 +89,13 @@
 
 -(void)testItCanBuildDates
 {
-    NSDate *date = [NSDate date];
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970:60 * 60 * 24];
     LDBObject *obj = [[[LDBObjectBuilder builder] appendDate:date forField:@"myfield"] finish];
     XCTAssert([obj containsField:@"myfield"]);
     NSTimeInterval i1 = [date timeIntervalSince1970];
     NSTimeInterval i2 = [[obj dateForField:@"myfield"] timeIntervalSince1970];
     XCTAssertEqualWithAccuracy(i1, i2, 1e-3);
+    XCTAssertEqual(60 * 60 * 24 * 1000, [obj dateRawForField:@"myfield"]);
 }
 
 -(void)testItCanBuildInts
