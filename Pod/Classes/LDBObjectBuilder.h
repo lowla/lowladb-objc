@@ -20,6 +20,7 @@
 - (LDBObjectBuilder *)appendObjectId:(LDBObjectId *)value forField:(NSString *)field;
 - (LDBObjectBuilder *)appendBool:(BOOL)value forField:(NSString *)field;
 - (LDBObjectBuilder *)appendDate:(NSDate *)value forField:(NSString *)field;
+- (LDBObjectBuilder *)appendNullForField:(NSString *)field;
 - (LDBObjectBuilder *)appendInt:(int)value forField:(NSString *)field;
 - (LDBObjectBuilder *)appendLong:(int64_t)value forField:(NSString *)field;
 

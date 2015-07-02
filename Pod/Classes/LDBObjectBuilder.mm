@@ -60,6 +60,11 @@
     return self;
 }
 
+- (LDBObjectBuilder *)appendNullForField:(NSString *)field  {
+    self.bson->appendNull([field UTF8String]);
+    return self;
+}
+
 - (LDBObjectBuilder *)appendInt:(int)value forField:(NSString *)field {
     self.bson->appendInt([field UTF8String], value);
     return self;

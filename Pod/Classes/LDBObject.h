@@ -24,6 +24,7 @@
 - (BOOL)boolForField:(NSString *)field;
 - (NSDate *)dateForField:(NSString *)field;
 - (int64_t)dateRawForField:(NSString *)field;
+- (BOOL)isFieldNull:(NSString *)field;
 - (int)intForField:(NSString *)field;
 - (int64_t)longForField:(NSString *)field;
 

@@ -59,6 +59,9 @@ static void appendValueToBuilder(NSString *key, id value, LDBObjectBuilder *buil
         }];
         [builder finishArray];
     }
+    else if ([value isKindOfClass:[NSNull class]]) {
+        [builder appendNullForField:key];
+    }
     else {
         NSDictionary *info = [NSDictionary dictionaryWithObject:key forKey:@"key"];
         NSException *e = [NSException
@@ -180,6 +183,10 @@ static void appendValueToBuilder(NSString *key, id value, LDBObjectBuilder *buil
         return answer;
     }
     return 0;
+}
+
+- (BOOL)isFieldNull:(NSString *)field {
+    return self.bson->nullForKey([field UTF8String]);
 }
 
 - (int)intForField:(NSString *)field {

@@ -98,6 +98,13 @@
     XCTAssertEqual(60 * 60 * 24 * 1000, [obj dateRawForField:@"myfield"]);
 }
 
+-(void)testItCanBuildNulls
+{
+    LDBObject *obj = [[[LDBObjectBuilder builder] appendNullForField:@"myfield"] finish];
+    XCTAssert([obj containsField:@"myfield"]);
+    XCTAssert([obj isFieldNull:@"myfield"]);
+}
+
 -(void)testItCanBuildInts
 {
     LDBObject *obj = [[[LDBObjectBuilder builder] appendInt:314 forField:@"myfield"] finish];
@@ -146,6 +153,17 @@
     XCTAssertTrue([obj containsField:@"myarr"]);
     LDBObject *sub = [obj arrayForField:@"myarr"];
     XCTAssertEqualObjects([sub stringForField:@"0"], @"mystring");
+}
+
+-(void)testItCanReadNullsFromADictionary
+{
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    [dict setObject:[NSNull null] forKey:@"mynull"];
+    
+    LDBObject *obj = [LDBObject objectWithDictionary:dict];
+    XCTAssertTrue([obj containsField:@"mynull"]);
+    XCTAssertTrue([obj isFieldNull:@"mynull"]);
+    XCTAssertFalse([obj isFieldNull:@"notmynull"]);
 }
 
 @end
